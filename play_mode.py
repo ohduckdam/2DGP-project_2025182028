@@ -3,6 +3,7 @@ from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import game_framework
 import game_world
+from background import Background
 
 
 def handle_events():
@@ -14,7 +15,8 @@ def handle_events():
 
 
 def init():
-    pass
+
+    game_world.add_object(Background(), game_world.BACKGROUND)
 
 
 def finish():
