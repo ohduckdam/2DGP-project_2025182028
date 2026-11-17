@@ -4,6 +4,9 @@ from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 import game_framework
 import game_world
 from background import Background
+from player import Player
+
+player = None
 
 
 def handle_events():
@@ -15,12 +18,17 @@ def handle_events():
 
 
 def init():
+    global player
+    player = Player()
 
     game_world.add_object(Background(), game_world.BACKGROUND)
+    game_world.add_object(player, game_world.OBJECT)
 
 
 def finish():
+    global player
     game_world.clear()
+    player = None
 
 
 def pause():
