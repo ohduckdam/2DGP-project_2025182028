@@ -5,6 +5,7 @@ import game_framework
 import game_world
 from background import Background
 from player import Player
+from ui import OilGauge
 
 player = None
 
@@ -25,6 +26,7 @@ def init():
 
     game_world.add_object(Background(), game_world.BACKGROUND)
     game_world.add_object(player, game_world.OBJECT)
+    game_world.add_object(OilGauge(player), game_world.UI)
 
 
 def finish():

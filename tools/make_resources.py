@@ -11,6 +11,13 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'resource')
 os.makedirs(OUT, exist_ok=True)
 
 
+def make_oil_bar():
+    back = Image.new('RGBA', (204, 20), (240, 220, 160, 255))
+    ImageDraw.Draw(back).rectangle((2, 2, 201, 17), fill=(20, 16, 36, 255))
+    back.save(os.path.join(OUT, 'oil_bar_back.png'))
+    Image.new('RGBA', (200, 16), (255, 170, 60, 255)).save(os.path.join(OUT, 'oil_bar_fill.png'))
+
+
 def make_background():
     """1280x720 숲 바닥. 640x360으로 그린 뒤 2배로 키워 도트 느낌을 낸다."""
     random.seed(7)
@@ -35,5 +42,6 @@ def make_background():
 
 
 if __name__ == '__main__':
+    make_oil_bar()
     make_background()
     print('resource/ 폴더에 이미지를 만들었습니다.')
