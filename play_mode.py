@@ -4,10 +4,12 @@ from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 import game_framework
 import game_world
 from background import Background
+from light import Light
 from player import Player
 from ui import OilGauge
 
 player = None
+light = None
 
 
 def handle_events():
@@ -21,18 +23,20 @@ def handle_events():
 
 
 def init():
-    global player
+    global player, light
     player = Player()
+    light = Light(player)
 
     game_world.add_object(Background(), game_world.BACKGROUND)
     game_world.add_object(player, game_world.OBJECT)
+    game_world.add_object(light, game_world.DARKNESS)
     game_world.add_object(OilGauge(player), game_world.UI)
 
 
 def finish():
-    global player
+    global player, light
     game_world.clear()
-    player = None
+    player, light = None, None
 
 
 def pause():
