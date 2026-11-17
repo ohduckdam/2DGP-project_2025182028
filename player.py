@@ -2,7 +2,8 @@ import math
 
 from pico2d import load_image, get_canvas_width, get_canvas_height
 from sdl2 import (SDL_KEYDOWN, SDL_KEYUP, SDLK_w, SDLK_a, SDLK_s, SDLK_d,
-                  SDL_MOUSEMOTION, SDL_MOUSEWHEEL)
+                  SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP,
+                  SDL_MOUSEWHEEL, SDL_BUTTON_LEFT)
 from transitions import Machine
 
 import game_framework
@@ -64,6 +65,7 @@ class Player:
         self.oil = MAX_OIL
         self.light_mode = 'SPREAD'            # 'SPREAD'(확산) 또는 'FOCUS'(집중)
         self.wheel_mode = 'SPREAD'            # 휠로 고른 모드
+        self.left_button_held = False         # 좌클릭을 누르는 동안은 집중 (휠이 불편할 때 대안)
         self.mouse_x, self.mouse_y = self.x + 100, self.y
 
         self.states = {'IDLE': Idle(), 'RUN': Run()}
@@ -91,7 +93,7 @@ class Player:
         return math.atan2(self.mouse_y - self.y, self.mouse_x - self.x)
 
     def update_light_mode(self):
-        self.light_mode = self.wheel_mode
+        self.light_mode = 'FOCUS' if self.left_button_held else self.wheel_mode
 
     # ---- 입력 ----
     def handle_event(self, event):
@@ -100,6 +102,11 @@ class Player:
             return
         if event.type == SDL_MOUSEWHEEL:
             self.wheel_mode = 'SPREAD' if event.wheel > 0 else 'FOCUS'
+            self.update_light_mode()
+            return
+        if event.type in (SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) and event.button == SDL_BUTTON_LEFT:
+            self.left_button_held = (event.type == SDL_MOUSEBUTTONDOWN)
+            self.mouse_x, self.mouse_y = event.x, get_canvas_height() - 1 - event.y
             self.update_light_mode()
             return
 
@@ -124,6 +131,8 @@ class Player:
     def pause(self):
         self.pressed_keys.clear()
         self.dir_x, self.dir_y = 0, 0
+        self.left_button_held = False
+        self.update_light_mode()
         if self.state == 'RUN':
             self.stop_run()
 
