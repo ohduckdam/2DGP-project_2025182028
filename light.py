@@ -4,7 +4,9 @@ from pico2d import load_image, get_canvas_width, get_canvas_height
 SPREAD_SIZE = 512          # spread_hole.png 크기
 SPREAD_BASE_R = 128        # spread_hole.png 의 기준 빛 반경
 
-SPREAD_RADIUS = 240        # 빛 반경 (px)
+# 빛 반경 = 기본 + 기름 × 계수 (기름 100일 때 240px)
+SPREAD_MIN_R = 80
+SPREAD_PER_OIL = 1.6
 
 
 class Light:
@@ -17,7 +19,7 @@ class Light:
 
     @property
     def radius(self):
-        return SPREAD_RADIUS
+        return SPREAD_MIN_R + self.player.oil * SPREAD_PER_OIL
 
     # ---- 그리기 ----
     def fill_outside(self, left, bottom, right, top):
