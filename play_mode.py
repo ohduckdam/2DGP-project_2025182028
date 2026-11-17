@@ -15,6 +15,8 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
+        else:
+            player.handle_event(event)
 
 
 def init():
@@ -32,7 +34,7 @@ def finish():
 
 
 def pause():
-    pass
+    player.pause()
 
 
 def resume():
