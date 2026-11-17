@@ -37,6 +37,9 @@ class Run:
             dx, dy = dx / math.sqrt(2), dy / math.sqrt(2)
         player.x += dx * MOVE_SPEED * game_framework.frame_time
         player.y += dy * MOVE_SPEED * game_framework.frame_time
+        half_w, half_h = DRAW_W // 2, DRAW_H // 2
+        player.x = max(half_w, min(get_canvas_width() - half_w, player.x))
+        player.y = max(half_h, min(get_canvas_height() - half_h, player.y))
 
     def draw(self, player):
         player.draw_frame(0)
