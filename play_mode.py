@@ -1,9 +1,10 @@
-from pico2d import clear_canvas, update_canvas, get_events
+from pico2d import clear_canvas, update_canvas
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import game_framework
 import game_world
 from background import Background
+from events import get_events      # 마우스 휠까지 받기 위해 pico2d 대신 events.py 의 get_events 사용
 from light import Light
 from player import Player
 from ui import OilGauge

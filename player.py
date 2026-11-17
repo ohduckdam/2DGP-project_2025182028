@@ -1,7 +1,8 @@
 import math
 
 from pico2d import load_image, get_canvas_width, get_canvas_height
-from sdl2 import (SDL_KEYDOWN, SDL_KEYUP, SDLK_w, SDLK_a, SDLK_s, SDLK_d)
+from sdl2 import (SDL_KEYDOWN, SDL_KEYUP, SDLK_w, SDLK_a, SDLK_s, SDLK_d,
+                  SDL_MOUSEMOTION, SDL_MOUSEWHEEL)
 from transitions import Machine
 
 import game_framework
@@ -62,6 +63,8 @@ class Player:
         # 빛
         self.oil = MAX_OIL
         self.light_mode = 'SPREAD'            # 'SPREAD'(확산) 또는 'FOCUS'(집중)
+        self.wheel_mode = 'SPREAD'            # 휠로 고른 모드
+        self.mouse_x, self.mouse_y = self.x + 100, self.y
 
         self.states = {'IDLE': Idle(), 'RUN': Run()}
         self.machine = Machine(
@@ -81,8 +84,24 @@ class Player:
     def on_enter_RUN(self):
         self.states['RUN'].enter(self)
 
+    # ---- 빛 ----
+    @property
+    def aim_angle(self):
+        """호롱에서 마우스를 향하는 각도 (라디안, 오른쪽 0, 반시계 방향 +)"""
+        return math.atan2(self.mouse_y - self.y, self.mouse_x - self.x)
+
+    def update_light_mode(self):
+        self.light_mode = self.wheel_mode
+
     # ---- 입력 ----
     def handle_event(self, event):
+        if event.type == SDL_MOUSEMOTION:
+            self.mouse_x, self.mouse_y = event.x, get_canvas_height() - 1 - event.y
+            return
+        if event.type == SDL_MOUSEWHEEL:
+            self.wheel_mode = 'SPREAD' if event.wheel > 0 else 'FOCUS'
+            self.update_light_mode()
+            return
 
         if event.type not in (SDL_KEYDOWN, SDL_KEYUP) or event.key not in MOVE_KEYS:
             return
