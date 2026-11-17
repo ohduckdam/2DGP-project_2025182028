@@ -2,6 +2,10 @@ from pico2d import load_image, get_canvas_width, get_canvas_height
 from sdl2 import (SDL_KEYDOWN, SDL_KEYUP, SDLK_w, SDLK_a, SDLK_s, SDLK_d)
 from transitions import Machine
 
+import game_framework
+
+# ---- 수치 (기획서 기준, 나중에 밸런스 조정) ----
+MOVE_SPEED = 200          # 이동 속도 (px/초)
 
 # ---- 스프라이트 ----
 FRAME_W, FRAME_H = 88, 80                 # horong_sheet.png 한 칸 크기 (4칸: 대기, 걷기1~3)
@@ -26,7 +30,9 @@ class Run:
         player.frame = 0
 
     def do(self, player):
-        pass
+        dx, dy = player.dir_x, player.dir_y
+        player.x += dx * MOVE_SPEED * game_framework.frame_time
+        player.y += dy * MOVE_SPEED * game_framework.frame_time
 
     def draw(self, player):
         player.draw_frame(0)
