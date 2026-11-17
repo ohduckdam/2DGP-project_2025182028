@@ -8,6 +8,8 @@ import game_framework
 
 # ---- 수치 (기획서 기준, 나중에 밸런스 조정) ----
 MOVE_SPEED = 200          # 이동 속도 (px/초)
+MAX_OIL = 100.0
+OIL_DRAIN = {'SPREAD': 2.0, 'FOCUS': 1.0}   # 모드별 초당 기름 소모
 
 # ---- 스프라이트 ----
 FRAME_W, FRAME_H = 88, 80                 # horong_sheet.png 한 칸 크기 (4칸: 대기, 걷기1~3)
@@ -57,6 +59,10 @@ class Player:
         self.face_dir = 1                     # 1: 오른쪽, -1: 왼쪽
         self.pressed_keys = set()
 
+        # 빛
+        self.oil = MAX_OIL
+        self.light_mode = 'SPREAD'            # 'SPREAD'(확산) 또는 'FOCUS'(집중)
+
         self.states = {'IDLE': Idle(), 'RUN': Run()}
         self.machine = Machine(
             model=self,
@@ -105,6 +111,7 @@ class Player:
     # ---- 매 프레임 ----
     def update(self):
         self.states[self.state].do(self)
+        self.oil = max(0.0, self.oil - OIL_DRAIN[self.light_mode] * game_framework.frame_time)
 
     def draw_frame(self, index):
         flip = '' if self.face_dir == 1 else 'h'
