@@ -54,6 +54,7 @@ class Player:
         self.image = load_image('resource/horong_sheet.png')
         self.frame = 0
         self.dir_x, self.dir_y = 0, 0
+        self.face_dir = 1                     # 1: 오른쪽, -1: 왼쪽
         self.pressed_keys = set()
 
         self.states = {'IDLE': Idle(), 'RUN': Run()}
@@ -86,6 +87,8 @@ class Player:
 
         self.dir_x = sum(MOVE_KEYS[k][0] for k in self.pressed_keys)
         self.dir_y = sum(MOVE_KEYS[k][1] for k in self.pressed_keys)
+        if self.dir_x != 0:
+            self.face_dir = self.dir_x
 
         moving = self.dir_x != 0 or self.dir_y != 0
         if moving and self.state == 'IDLE':
@@ -104,7 +107,9 @@ class Player:
         self.states[self.state].do(self)
 
     def draw_frame(self, index):
-        self.image.clip_draw(index * FRAME_W, 0, FRAME_W, FRAME_H, self.x, self.y, DRAW_W, DRAW_H)
+        flip = '' if self.face_dir == 1 else 'h'
+        self.image.clip_composite_draw(index * FRAME_W, 0, FRAME_W, FRAME_H,
+                                       0, flip, self.x, self.y, DRAW_W, DRAW_H)
 
     def draw(self):
         self.states[self.state].draw(self)
