@@ -12,6 +12,8 @@ MOVE_SPEED = 200          # 이동 속도 (px/초)
 # ---- 스프라이트 ----
 FRAME_W, FRAME_H = 88, 80                 # horong_sheet.png 한 칸 크기 (4칸: 대기, 걷기1~3)
 DRAW_W, DRAW_H = 66, 60                   # 화면에 그릴 크기
+RUN_FRAMES = [1, 2, 3, 2]                 # 걷기 애니메이션 순서
+RUN_FPS = 8                               # 걷기 애니메이션 초당 프레임
 
 MOVE_KEYS = {SDLK_w: (0, 1), SDLK_s: (0, -1), SDLK_a: (-1, 0), SDLK_d: (1, 0)}
 
@@ -32,6 +34,7 @@ class Run:
         player.frame = 0
 
     def do(self, player):
+        player.frame = (player.frame + RUN_FPS * game_framework.frame_time) % len(RUN_FRAMES)
         dx, dy = player.dir_x, player.dir_y
         if dx and dy:                         # 대각선은 같은 속도가 되도록 정규화
             dx, dy = dx / math.sqrt(2), dy / math.sqrt(2)
@@ -42,7 +45,7 @@ class Run:
         player.y = max(half_h, min(get_canvas_height() - half_h, player.y))
 
     def draw(self, player):
-        player.draw_frame(0)
+        player.draw_frame(RUN_FRAMES[int(player.frame)])
 
 
 class Player:
