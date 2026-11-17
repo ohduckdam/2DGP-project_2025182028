@@ -1,8 +1,13 @@
+import math
+
 from pico2d import load_image, get_canvas_width, get_canvas_height
 
 # tools/make_resources.py 의 값과 같아야 한다
 SPREAD_SIZE = 512          # spread_hole.png 크기
 SPREAD_BASE_R = 128        # spread_hole.png 의 기준 빛 반경
+FOCUS_SIZE = 1024          # focus_hole.png 크기
+BEAM_LENGTH = 360          # 광선 길이
+BEAM_HALF_WIDTH = 20       # 광선 반폭
 
 # 빛 반경 = 기본 + 기름 × 계수 (기름 100일 때 240px)
 SPREAD_MIN_R = 80
@@ -15,6 +20,7 @@ class Light:
     def __init__(self, player):
         self.player = player
         self.spread_hole = load_image('resource/spread_hole.png')
+        self.focus_hole = load_image('resource/focus_hole.png')
         self.dark = load_image('resource/dark.png')
 
     @property
@@ -44,7 +50,12 @@ class Light:
 
     def draw(self):
         p = self.player
-        size = SPREAD_SIZE * self.radius / SPREAD_BASE_R
-        self.spread_hole.draw(p.x, p.y, size, size)
-        half = size / 2
+        if p.light_mode == 'SPREAD':
+            size = SPREAD_SIZE * self.radius / SPREAD_BASE_R
+            self.spread_hole.draw(p.x, p.y, size, size)
+            half = size / 2
+        else:
+            self.focus_hole.rotate_draw(p.aim_angle, p.x, p.y)
+            # 회전한 이미지는 최소한 반지름 FOCUS_SIZE/2 원을 덮는다. 그 원 안에 들어가는 정사각형 바깥을 채운다.
+            half = FOCUS_SIZE / 2 / math.sqrt(2)
         self.fill_outside(p.x - half, p.y - half, p.x + half, p.y + half)

@@ -16,6 +16,10 @@ WARM = (255, 190, 90)      # 등불 빛 색
 # 빛 설정 (light.py 의 값과 반드시 같아야 한다)
 SPREAD_SIZE = 512          # 확산 마스크 이미지 크기
 SPREAD_BASE_R = 128        # 확산 마스크의 기준 빛 반경 (이 반경을 기준으로 확대/축소)
+FOCUS_SIZE = 1024          # 집중 마스크 이미지 크기
+FOCUS_CIRCLE_R = 60        # 집중 모드에서 호롱 주변 작은 원
+BEAM_LENGTH = 360          # 광선 길이
+BEAM_HALF_WIDTH = 20       # 광선 반폭 (폭 40)
 
 
 def mix(dark, warm):
@@ -47,6 +51,30 @@ def make_spread_hole():
             warm = 0.12 * max(0.0, 1 - d / r_out)
             px[x, y] = mix(dark, warm)
     im.save(os.path.join(OUT, 'spread_hole.png'))
+
+
+def make_focus_hole():
+    """작은 원 + 오른쪽(0도 방향)으로 뻗은 막대 모양 광선 구멍. 게임에서 마우스 방향으로 회전시킨다."""
+    n = FOCUS_SIZE
+    c = n / 2
+    im = Image.new('RGBA', (n, n))
+    px = im.load()
+    for y in range(n):
+        for x in range(n):
+            dx, dy = x + 0.5 - c, c - (y + 0.5)          # y 위쪽이 + 가 되도록
+            # 작은 원
+            d = math.hypot(dx, dy)
+            circle_dark = smooth((d - FOCUS_CIRCLE_R * 0.5) / (FOCUS_CIRCLE_R * 0.7))
+            # 광선 (x 축 양의 방향)
+            # 광선 끝 30px 동안 서서히 어두워져서 BEAM_LENGTH 에서 완전히 어두워진다
+            along_out = max(0.0, dx - (BEAM_LENGTH - 30), -dx)
+            side_out = max(0.0, abs(dy) - (BEAM_HALF_WIDTH - 6))
+            beam_dark = smooth(max(along_out / 30, side_out / 8))
+            dark = min(circle_dark, beam_dark)
+            beam_warm = 0.25 * max(0.0, 1 - max(dx, 0) / BEAM_LENGTH) * (1 - beam_dark)
+            circle_warm = 0.12 * (1 - circle_dark)
+            px[x, y] = mix(dark, max(beam_warm, circle_warm))
+    im.save(os.path.join(OUT, 'focus_hole.png'))
 
 
 def make_dark():
@@ -85,6 +113,7 @@ def make_background():
 
 if __name__ == '__main__':
     make_spread_hole()
+    make_focus_hole()
     make_dark()
     make_oil_bar()
     make_background()
