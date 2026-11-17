@@ -1,3 +1,5 @@
+import math
+
 from pico2d import load_image, get_canvas_width, get_canvas_height
 from sdl2 import (SDL_KEYDOWN, SDL_KEYUP, SDLK_w, SDLK_a, SDLK_s, SDLK_d)
 from transitions import Machine
@@ -31,6 +33,8 @@ class Run:
 
     def do(self, player):
         dx, dy = player.dir_x, player.dir_y
+        if dx and dy:                         # 대각선은 같은 속도가 되도록 정규화
+            dx, dy = dx / math.sqrt(2), dy / math.sqrt(2)
         player.x += dx * MOVE_SPEED * game_framework.frame_time
         player.y += dy * MOVE_SPEED * game_framework.frame_time
 
