@@ -27,6 +27,23 @@ class Light:
     def radius(self):
         return SPREAD_MIN_R + self.player.oil * SPREAD_PER_OIL
 
+    # ---- 판정 (다음 주차에 적과 함께 사용) ----
+    def in_spread_light(self, x, y):
+        """확산 모드일 때 (x, y)가 빛 안에 있는가"""
+        p = self.player
+        return p.light_mode == 'SPREAD' and math.hypot(x - p.x, y - p.y) <= self.radius
+
+    def in_beam(self, x, y, r=0):
+        """집중 모드일 때 반지름 r인 물체가 광선에 닿는가"""
+        p = self.player
+        if p.light_mode != 'FOCUS':
+            return False
+        a = p.aim_angle
+        dx, dy = x - p.x, y - p.y
+        along = dx * math.cos(a) + dy * math.sin(a)       # 광선 방향으로의 거리
+        side = -dx * math.sin(a) + dy * math.cos(a)       # 광선에서 옆으로 벗어난 거리
+        return -r <= along <= BEAM_LENGTH + r and abs(side) <= BEAM_HALF_WIDTH + r
+
     # ---- 그리기 ----
     def fill_outside(self, left, bottom, right, top):
         """화면에서 사각형 (left, bottom)~(right, top) 바깥을 모두 어둠으로 칠한다."""
